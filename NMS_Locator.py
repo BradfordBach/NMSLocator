@@ -1,16 +1,15 @@
 import json
 import os
 import datetime
-import threading
+import time
 import pyperclip
 
 def get_current_location():
-    my_save = open(save, "r")
+    with open(save, "r", encoding='utf-8') as save_file:
+        save_file_string = save_file.read()[:-1]
+    parsed_save = json.loads(save_file_string)
 
-    my_save_string = my_save.read()[:-1]
-    complete_save = json.loads(my_save_string)
-
-    json_player_data = complete_save['6f=']["yhJ"]["oZw"]
+    json_player_data = parsed_save['6f=']["yhJ"]["oZw"]
 
     Player_State = {'x':json_player_data["dZj"], 'y':json_player_data['IyE'], 'z':json_player_data["uXE"], 'ssi':json_player_data['vby']}
     galactic_address = format_galaxtic_coord(Player_State['x'], Player_State['y'], Player_State['z'], Player_State['ssi'])
@@ -68,12 +67,16 @@ def load_log():
     return location_log, log_dir + os.sep + "location_log.log"
 
 def run_location_gatherer():
-    threading.Timer(15.0, run_location_gatherer).start()
-    if get_file_mod_time() not in mod_times:
-        mod_times.append(get_file_mod_time())
-        get_current_location()
-    if len(mod_times) >= 200:
-        mod_times.clear()
+    try:
+        while True:
+            if get_file_mod_time() not in mod_times:
+                mod_times.append(get_file_mod_time())
+                get_current_location()
+            if len(mod_times) >= 200:
+                mod_times.clear()
+            time.sleep(15)
+    except KeyboardInterrupt:
+        pass
 
 location_log, log_loc = load_log()
 save = get_latest_save_file()
