@@ -3,6 +3,7 @@ import os
 import datetime
 import time
 import pyperclip
+from shutil import copyfile
 
 def get_current_location():
     with open(save, "r", encoding='utf-8') as save_file:
@@ -34,12 +35,26 @@ def get_latest_save_file():
     return latest_save
 
 def check_if_address_exists(galactic_address):
-    if galactic_address in location_log:
+    if any(galactic_address in entry for entry in location_log):
         return True
+
+def is_date_in_log(date):
+    for entry in location_log:
+        if entry[0].date() == date.date():
+            return True
+    return False
 
 def enter_address_into_log(galactic_address, dt):
     with open(log_loc, "a") as log:
-        log.write(dt.strftime("%B %d %I:%M:%S %p") + ',' + galactic_address + '\n')
+        log.write(dt.strftime("%B %d %Y %I:%M:%S %p") + ',' + galactic_address + '\n')
+    with open(log_dir + os.sep + "bulk.log", 'a') as bulk:
+        if is_date_in_log(dt):
+            bulk.write(galactic_address + '\n')
+        else:
+            bulk.write(dt.strftime("%B %d %Y") + '\n')
+            bulk.write(galactic_address + '\n')
+
+    location_log.append([dt, galactic_address])
 
 def format_galaxtic_coord(x, y, z, ssi):
     fmt = "{0:0{1}X}"
@@ -47,7 +62,6 @@ def format_galaxtic_coord(x, y, z, ssi):
     return(':'.join(parts))
 
 def load_log():
-    log_dir = os.getenv('LOCALAPPDATA') + os.sep + 'Programs' + os.sep + "NMS Locator"
     try:
         os.makedirs(log_dir)
     except FileExistsError:
@@ -61,10 +75,59 @@ def load_log():
     with open(log_dir + os.sep + "location_log.log") as log:
         line = log.readline().strip()
         while line:
-            location_log.append(line.split(',')[1])
+            split_line = line.split(',')
+            location_log.append([datetime.datetime.strptime(split_line[0], "%B %d %Y %I:%M:%S %p"), split_line[1]])
             line = log.readline().strip()
 
     return location_log, log_dir + os.sep + "location_log.log"
+
+def create_bulk_log():
+    if not os.path.isfile(log_dir + os.sep + "bulk.log"):
+        try:
+            open(log_dir + os.sep + "bulk.log", 'a')
+        except IOError:
+            open(log_dir + os.sep + "bulk.log", 'w')
+
+        # convert existing location log into the new bulk format, this is only ever done once and only for people who used v0.2
+        if os.path.getsize(log_dir + os.sep + "bulk.log") == 0:
+            with open(log_dir + os.sep + "bulk.log", 'a') as bulk:
+                location_dict = {}
+                for location in location_log:
+                    if location[0].strftime("%B %d %Y") not in location_dict:
+                        location_dict[location[0].strftime("%B %d %Y")] = []
+                    location_dict[location[0].strftime("%B %d %Y")].append(location[1])
+                first = True
+                for date, addresses in location_dict.items():
+                    if first:
+                        bulk.write(date + '\n')
+                        first = False
+                    else:
+                        bulk.write('\n' + date + '\n')
+                    for address in addresses:
+                        bulk.write(address + '\n')
+
+def add_years_to_location_log():
+    # Add years to location_log file, because I forgot to do this on the first release
+    if os.path.isfile(log_dir + os.sep + "location_log.log"):
+        temp_log = []
+        with open(log_dir + os.sep + "location_log.log", "r") as log:
+            line = log.readline().strip()
+            try:
+                while line:
+                    split_line = line.split(',')
+                    temp_log.append([datetime.datetime.strptime(split_line[0], "%B %d %I:%M:%S %p"), split_line[1]])
+                    line = log.readline().strip()
+
+                    copyfile(log_dir + os.sep + "location_log.log", log_dir + os.sep + "location_log_backup.log")
+
+                with open(log_dir + os.sep + "location_log.log", "w") as log:
+                    for location in temp_log:
+                        location[0] = location[0].replace(year=2019)
+                        log.write(location[0].strftime("%B %d %Y %I:%M:%S %p") + ',' + location[1] + '\n')
+
+            except ValueError:
+                pass
+
 
 def run_location_gatherer():
     try:
@@ -78,7 +141,11 @@ def run_location_gatherer():
     except KeyboardInterrupt:
         pass
 
+log_dir = os.getenv('LOCALAPPDATA') + os.sep + 'Programs' + os.sep + "NMS Locator"
+
+add_years_to_location_log()
 location_log, log_loc = load_log()
+create_bulk_log()
 save = get_latest_save_file()
 mod_times = []
 print("Waiting for new locations every 15 seconds.\nNew locations will be copied to clipboard and displayed...")
