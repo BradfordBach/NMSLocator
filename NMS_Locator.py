@@ -3,6 +3,8 @@ import os
 import datetime
 import time
 import pyperclip
+import winsound
+import configparser
 from shutil import copyfile
 
 def get_current_location():
@@ -21,6 +23,9 @@ def get_current_location():
         print(time_logged.strftime("%B %d %I:%M:%S %p -> "), end='')
         print(galactic_address)
         pyperclip.copy(galactic_address)
+
+        if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
+            winsound.PlaySound('notification.wav', winsound.SND_FILENAME)
 
 def get_file_mod_time():
     return os.path.getmtime(save)
@@ -51,7 +56,7 @@ def enter_address_into_log(galactic_address, dt):
         if is_date_in_log(dt):
             bulk.write(galactic_address + '\n')
         else:
-            bulk.write(dt.strftime("%B %d %Y") + '\n')
+            bulk.write('\n' + dt.strftime("%B %d %Y") + '\n')
             bulk.write(galactic_address + '\n')
 
     location_log.append([dt, galactic_address])
@@ -128,6 +133,10 @@ def add_years_to_location_log():
             except ValueError:
                 pass
 
+def load_config():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    return config
 
 def run_location_gatherer():
     try:
@@ -143,6 +152,7 @@ def run_location_gatherer():
 
 log_dir = os.getenv('LOCALAPPDATA') + os.sep + 'Programs' + os.sep + "NMS Locator"
 
+config = load_config()
 add_years_to_location_log()
 location_log, log_loc = load_log()
 create_bulk_log()
