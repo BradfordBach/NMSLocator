@@ -167,9 +167,9 @@ def update_csv(completed_bh_pairing):
     fieldnames = ['bh-address', 'bh-system', 'bh-region', 'bh-econ', 'bh-life',
                   'exit-address', 'exit-system', 'exit-region', 'exit-econ', 'exit-life']
 
-    with open(log_dir + os.sep + "black_holes.csv", 'a') as bhfile:
+    with open(csv_dir + os.sep + "black_holes.csv", 'a') as bhfile:
         writer = csv.DictWriter(bhfile, lineterminator='\n', fieldnames=fieldnames)
-        if os.path.getsize(log_dir + os.sep + "black_holes.csv") == 0:
+        if os.path.getsize(csv_dir + os.sep + "black_holes.csv") == 0:
             writer.writeheader()
 
         writer.writerow(completed_bh_pairing)
