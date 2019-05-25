@@ -54,13 +54,18 @@ def get_latest_save_file():
 
 def get_latest_screenshot():
     all_screenshot_files = []
+    exclude = set(["thumbnails"])
     for (dirpath, dirnames, filenames) in os.walk(config.get('SETTINGS', 'SCREENSHOT_DIRECTORY')):
-        for dir in dirnames:
-            if dir != 'thumbnails':
-                for file in filenames:
-                    if file[-4:] == ".jpg":
-                        all_screenshot_files.append(os.path.join(dirpath, file))
-    latest_save = max(all_screenshot_files, key=os.path.getmtime)
+        dirnames[:] = [d for d in dirnames if d not in exclude]
+        for file in filenames:
+            if file[-4:] == ".jpg":
+                all_screenshot_files.append(os.path.join(dirpath, file))
+
+    try:
+        latest_save = max(all_screenshot_files, key=os.path.getmtime)
+    except ValueError:
+        print('No screenshot found in screenshot directory on latest check')
+        latest_save = None
 
     # if latest file is already cropped it means we've already processed it, so skip it
     if os.path.isfile("cropped" + os.sep + os.path.splitext(os.path.basename(file))[0] + "_cropped.png"):
