@@ -58,7 +58,7 @@ def get_latest_screenshot():
     for (dirpath, dirnames, filenames) in os.walk(config.get('SETTINGS', 'SCREENSHOT_DIRECTORY')):
         dirnames[:] = [d for d in dirnames if d not in exclude]
         for file in filenames:
-            if file[-4:] == ".jpg":
+            if file[-4:] == ".jpg" or file[-4:] == '.png':
                 all_screenshot_files.append(os.path.join(dirpath, file))
 
     try:

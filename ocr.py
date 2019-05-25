@@ -72,7 +72,9 @@ def fix_common_ocr_issues(text):
     if '|' in text:
         text = text.replace('|', 'I')
     if text[:1] == 'l':
-        text[:1] = 'I'
+        text = list(text)
+        text[0] = 'I'
+        text = ''.join(text)
     if ' l ' in text:
         text = text.replace(' l ', ' I ')
 

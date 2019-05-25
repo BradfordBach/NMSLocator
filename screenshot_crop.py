@@ -33,6 +33,8 @@ def crop_screenshot(file):
         while line:
             parts = line.split(':')
             if str(width) + ',' + str(height) == parts[0]:
+                if os.path.splitext(file)[1].lower() == '.png':
+                    img = img.convert('RGB')
 
                 pixels_to_crop = parts[1].split(',')
                 pixels_to_crop = [int(pixel) for pixel in pixels_to_crop]
@@ -52,4 +54,3 @@ def crop_screenshot(file):
     invert_cropped_img = PIL.ImageOps.invert(cropped_img)
     invert_cropped_img.save("cropped" + os.sep + os.path.splitext(os.path.basename(file))[0] + "_cropped.png", "PNG", quality=100)
     return "cropped" + os.sep + os.path.splitext(os.path.basename(file))[0] + "_cropped.png"
-
