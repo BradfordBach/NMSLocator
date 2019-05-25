@@ -68,8 +68,9 @@ def get_latest_screenshot():
         latest_save = None
 
     # if latest file is already cropped it means we've already processed it, so skip it
-    if os.path.isfile("cropped" + os.sep + os.path.splitext(os.path.basename(file))[0] + "_cropped.png"):
-        latest_save = None
+    if latest_save:
+        if os.path.isfile("cropped" + os.sep + os.path.splitext(os.path.basename(latest_save))[0] + "_cropped.png"):
+            latest_save = None
 
     return latest_save
 
