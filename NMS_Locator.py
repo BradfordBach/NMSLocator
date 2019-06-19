@@ -12,7 +12,6 @@ from copy import deepcopy
 from screenshot_crop import crop_screenshot
 
 
-
 def get_current_location(last_save):
     with open(last_save, "r", encoding='utf-8') as save_file:
         save_file_string = save_file.read()[:-1]
@@ -26,8 +25,7 @@ def get_current_location(last_save):
     if not check_if_address_exists(galactic_address):
         time_logged = datetime.datetime.now()
         enter_address_into_log(galactic_address, time_logged)
-        print(time_logged.strftime("%B %d %I:%M:%S %p -> "), end='')
-        print(galactic_address)
+        print('Galactic address: ' + galactic_address)
         pyperclip.copy(galactic_address)
 
         if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
@@ -156,7 +154,7 @@ def create_bulk_log():
 def update_csv(completed_bh_pairing):
     csv_dir = log_dir
 
-    if config.get('SETTINGS', 'CSV_DIRECTORY') != 'DEFAULT':
+    if config.get('SETTINGS', 'CSV_DIRECTORY').upper() != 'DEFAULT':
         csv_dir = config.get('SETTINGS', 'CSV_DIRECTORY')
 
     try:
@@ -223,8 +221,9 @@ def gather_system_info():
                     ocr_info = ocr.ocr_screenshot(cropped_screen, config.get('SETTINGS', 'TESSERACT_LOC'))
                     if ocr_info:
                         system_info = deepcopy(ocr_info)
+                        print('Successfully found system info in screenshot:')
                         for k, v in system_info.items():
-                            print(k + ':',v)
+                            print(k.capitalize() + ':',v)
                         ocr_info.clear()
 
                 if galactic_address and system_info:
@@ -233,12 +232,9 @@ def gather_system_info():
                     galactic_address = None
                     system_info.clear()
 
-                    # log completed system info for safe keeping
-                    for k, v in completed_system_info.items():
-                        print(k + ':',v)
-
                     if completed_system_info['address'][-2:] == '79' and not completed_bh_pairing:
                         #This is a black hole system!
+                        print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
                         for key in list(completed_system_info):
                             completed_bh_pairing['bh-' + key] = completed_system_info.pop(key)
                     elif completed_system_info['address'][-2:] != '79' and not completed_bh_pairing:
@@ -250,14 +246,18 @@ def gather_system_info():
                                          completed_system_info, "Cannot reconcile this. DOES NOT COMPUTE")
                     elif completed_system_info['address'][-2:] != '79' and completed_bh_pairing:
                         # This is the second half of a bh pairing
+                        print('Storing Exit system ' + completed_system_info['system'] + '...\n')
                         for key in list(completed_system_info):
                             completed_bh_pairing['exit-' + key] = completed_system_info.pop(key)
 
                     completed_system_info.clear()
                     if 'bh-address' in completed_bh_pairing.keys() and 'exit-address' in completed_bh_pairing.keys():
                         print('Completed BH pairing!')
+                        time_logged = datetime.datetime.now()
+                        print(time_logged.strftime("Time logged: %B %d %I:%M:%S %p"))
+                        print(completed_bh_pairing['bh-system'] + ' System -> ' + completed_bh_pairing['exit-system'] + ' System \n')
                         update_csv(completed_bh_pairing)
-                        print(completed_bh_pairing)
+                        print('*' * 20 + '\n')
                         completed_bh_pairing.clear()
 
             time.sleep(15)
@@ -272,5 +272,5 @@ location_log, log_loc = load_log()
 create_bulk_log()
 save = get_latest_save_file()
 mod_times = []
-print("Waiting for new locations every 15 seconds.\nNew locations will be copied to clipboard and displayed...")
+print("Waiting for new locations every 15 seconds.\nNew locations will be copied to clipboard and displayed...\n")
 gather_system_info()
