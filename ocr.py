@@ -77,5 +77,11 @@ def fix_common_ocr_issues(text):
         text = ''.join(text)
     if ' l ' in text:
         text = text.replace(' l ', ' I ')
+    if ' Ill' in text:
+        text = text.replace(' Ill', ' III')
+    if ' lV' in text:
+        text = text.replace(' lV', ' IV')
+    if ' XVIll' in text:
+        text = text.replace(' XVIll', ' XVIII')
 
     return text
