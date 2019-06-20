@@ -69,6 +69,8 @@ def ocr_screenshot(file, tesseract):
 def fix_common_ocr_issues(text):
     if '-l' in text:
         text = text.replace('-l', '-I')
+    if '-k' in text:
+        text = text.replace('-k', '-K')
     if '|' in text:
         text = text.replace('|', 'I')
     if text[:1] == 'l':

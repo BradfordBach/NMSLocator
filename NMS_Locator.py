@@ -10,7 +10,8 @@ import csv
 from shutil import copyfile
 from copy import deepcopy
 from screenshot_crop import crop_screenshot
-
+from table_output import BHTable
+from colorclass import Windows
 
 def get_current_location(last_save):
     with open(last_save, "r", encoding='utf-8') as save_file:
@@ -25,7 +26,7 @@ def get_current_location(last_save):
     if not check_if_address_exists(galactic_address):
         time_logged = datetime.datetime.now()
         enter_address_into_log(galactic_address, time_logged)
-        print('Galactic address: ' + galactic_address)
+        table_handler.output_address(galactic_address)
         pyperclip.copy(galactic_address)
 
         if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
@@ -221,9 +222,7 @@ def gather_system_info():
                     ocr_info = ocr.ocr_screenshot(cropped_screen, config.get('SETTINGS', 'TESSERACT_LOC'))
                     if ocr_info:
                         system_info = deepcopy(ocr_info)
-                        print('Successfully found system info in screenshot:')
-                        for k, v in system_info.items():
-                            print(k.capitalize() + ':',v)
+                        table_handler.output_ocr_info(ocr_info)
                         ocr_info.clear()
 
                 if galactic_address and system_info:
@@ -234,7 +233,7 @@ def gather_system_info():
 
                     if completed_system_info['address'][-2:] == '79' and not completed_bh_pairing:
                         #This is a black hole system!
-                        print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
+                        #print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
                         for key in list(completed_system_info):
                             completed_bh_pairing['bh-' + key] = completed_system_info.pop(key)
                     elif completed_system_info['address'][-2:] != '79' and not completed_bh_pairing:
@@ -246,18 +245,18 @@ def gather_system_info():
                                          completed_system_info, "Cannot reconcile this. DOES NOT COMPUTE")
                     elif completed_system_info['address'][-2:] != '79' and completed_bh_pairing:
                         # This is the second half of a bh pairing
-                        print('Storing Exit system ' + completed_system_info['system'] + '...\n')
+                        #print('Storing Exit system ' + completed_system_info['system'] + '...\n')
                         for key in list(completed_system_info):
                             completed_bh_pairing['exit-' + key] = completed_system_info.pop(key)
 
                     completed_system_info.clear()
                     if 'bh-address' in completed_bh_pairing.keys() and 'exit-address' in completed_bh_pairing.keys():
-                        print('Completed BH pairing!')
+                        print('Completed BH pairing and logging to CSV!')
                         time_logged = datetime.datetime.now()
                         print(time_logged.strftime("Time logged: %B %d %I:%M:%S %p"))
-                        print(completed_bh_pairing['bh-system'] + ' System -> ' + completed_bh_pairing['exit-system'] + ' System \n')
+                        print(completed_bh_pairing['bh-system'] + ' System -> ' + completed_bh_pairing['exit-system'] + ' System ')
                         update_csv(completed_bh_pairing)
-                        print('*' * 20 + '\n')
+                        table_handler.next_blackhole()
                         completed_bh_pairing.clear()
 
             time.sleep(15)
@@ -272,5 +271,7 @@ location_log, log_loc = load_log()
 create_bulk_log()
 save = get_latest_save_file()
 mod_times = []
+table_handler = BHTable()
+Windows.enable(auto_colors=True, reset_atexit=True)
 print("Waiting for new locations every 15 seconds.\nNew locations will be copied to clipboard and displayed...\n")
 gather_system_info()
