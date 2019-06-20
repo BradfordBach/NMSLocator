@@ -2,16 +2,15 @@ import json
 import os
 import datetime
 import time
-import pyperclip
-import winsound
 import configparser
 import ocr
 import csv
-from shutil import copyfile
 from copy import deepcopy
 from screenshot_crop import crop_screenshot
 from table_output import BHTable
 from colorclass import Windows
+from pyperclip import copy
+from winsound import PlaySound
 
 def get_current_location(last_save):
     with open(last_save, "r", encoding='utf-8') as save_file:
@@ -27,10 +26,10 @@ def get_current_location(last_save):
         time_logged = datetime.datetime.now()
         enter_address_into_log(galactic_address, time_logged)
         table_handler.output_address(galactic_address)
-        pyperclip.copy(galactic_address)
+        copy(galactic_address)
 
         if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
-            winsound.PlaySound('notification.wav', winsound.SND_FILENAME)
+            PlaySound('notification.wav', winsound.SND_FILENAME)
 
         return(galactic_address)
     else:
@@ -133,24 +132,6 @@ def create_bulk_log():
         except IOError:
             open(log_dir + os.sep + "bulk.log", 'w')
 
-        # convert existing location log into the new bulk format, this is only ever done once and only for people who used v0.2
-        if os.path.getsize(log_dir + os.sep + "bulk.log") == 0:
-            with open(log_dir + os.sep + "bulk.log", 'a') as bulk:
-                location_dict = {}
-                for location in location_log:
-                    if location[0].strftime("%B %d %Y") not in location_dict:
-                        location_dict[location[0].strftime("%B %d %Y")] = []
-                    location_dict[location[0].strftime("%B %d %Y")].append(location[1])
-                first = True
-                for date, addresses in location_dict.items():
-                    if first:
-                        bulk.write(date + '\n')
-                        first = False
-                    else:
-                        bulk.write('\n' + date + '\n')
-                    for address in addresses:
-                        bulk.write(address + '\n')
-
 
 def update_csv(completed_bh_pairing):
     csv_dir = log_dir
@@ -172,29 +153,6 @@ def update_csv(completed_bh_pairing):
             writer.writeheader()
 
         writer.writerow(completed_bh_pairing)
-
-
-def add_years_to_location_log():
-    # Add years to location_log file, because I forgot to do this on the first release
-    if os.path.isfile(log_dir + os.sep + "location_log.log"):
-        temp_log = []
-        with open(log_dir + os.sep + "location_log.log", "r") as log:
-            line = log.readline().strip()
-            try:
-                while line:
-                    split_line = line.split(',')
-                    temp_log.append([datetime.datetime.strptime(split_line[0], "%B %d %I:%M:%S %p"), split_line[1]])
-                    line = log.readline().strip()
-
-                    copyfile(log_dir + os.sep + "location_log.log", log_dir + os.sep + "location_log_backup.log")
-
-                with open(log_dir + os.sep + "location_log.log", "w") as log:
-                    for location in temp_log:
-                        location[0] = location[0].replace(year=2019)
-                        log.write(location[0].strftime("%B %d %Y %I:%M:%S %p") + ',' + location[1] + '\n')
-
-            except ValueError:
-                pass
 
 
 def load_config():
@@ -266,7 +224,6 @@ def gather_system_info():
 
 log_dir = os.getenv('LOCALAPPDATA') + os.sep + 'Programs' + os.sep + "NMS Locator"
 config = load_config()
-add_years_to_location_log()
 location_log, log_loc = load_log()
 create_bulk_log()
 save = get_latest_save_file()

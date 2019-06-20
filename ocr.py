@@ -1,6 +1,5 @@
-import pytesseract
 from PIL import Image
-import PIL.ImageOps
+from pytesseract import image_to_string, pytesseract
 import os
 
 
@@ -9,7 +8,7 @@ def ocr_many():
         for file in filenames:
             print(os.path.join(dirpath, file))
 
-            screenshot_text = pytesseract.image_to_string(Image.open(os.path.join(dirpath, file)))
+            screenshot_text = image_to_string(Image.open(os.path.join(dirpath, file)))
             screenshot_lines = screenshot_text.split('\n')
             for line in screenshot_lines:
                 if "System" in line:
@@ -26,8 +25,8 @@ def ocr_many():
 
 
 def ocr_screenshot(file, tesseract):
-    pytesseract.pytesseract.tesseract_cmd = tesseract
-    screenshot_text = pytesseract.image_to_string(Image.open(file))
+    pytesseract.tesseract_cmd = tesseract
+    screenshot_text = image_to_string(Image.open(file))
     filename = os.path.splitext(os.path.basename(file))[0]
     with open("cropped" + os.sep + filename + '.log', "w") as ocr_log:
         ocr_log.write(screenshot_text)
