@@ -154,6 +154,8 @@ def update_csv(completed_bh_pairing):
 
         writer.writerow(completed_bh_pairing)
 
+    bhfile.close()
+
 
 def load_config():
     config = configparser.ConfigParser()
@@ -161,6 +163,29 @@ def load_config():
     if config.get('SETTINGS', 'SCREENSHOT_DIRECTORY') == 'None' and config.getboolean('SETTINGS', 'OCR') is True:
         raise SystemExit("SCREENSHOT_DIRECTORY has not been set in your config.ini, this must be set to run")
     return config
+
+
+def handle_bh_pairing_logic(completed_system_info, completed_bh_pairing):
+    if completed_system_info['address'][-2:] == '79' and not completed_bh_pairing:
+        # This is a black hole system!
+        # print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
+        for key in list(completed_system_info):
+            completed_bh_pairing['bh-' + key] = completed_system_info.pop(key)
+    elif completed_system_info['address'][-2:] != '79' and not completed_bh_pairing:
+        print("Starting from a system that is not a black hole is not supported by this tool at this time.")
+    elif completed_system_info['address'][-2:] == '79' and completed_bh_pairing:
+        # This is if both the start and exit are black holes, this shouldn't really happen unless near the center
+        # and if they are near the center it will be the same black hole
+        raise SystemExit("Got two consecutive black hole addresses", completed_bh_pairing,
+                         completed_system_info, "Cannot reconcile this. DOES NOT COMPUTE")
+    elif completed_system_info['address'][-2:] != '79' and completed_bh_pairing:
+        # This is the second half of a bh pairing
+        # print('Storing Exit system ' + completed_system_info['system'] + '...\n')
+        for key in list(completed_system_info):
+            completed_bh_pairing['exit-' + key] = completed_system_info.pop(key)
+
+    return completed_system_info, completed_bh_pairing
+
 
 def gather_system_info():
     galactic_address = None
@@ -171,7 +196,8 @@ def gather_system_info():
         while True:
             last_modded_save = get_latest_save_file()
             last_modded_save_time = os.path.getmtime(last_modded_save)
-            if last_modded_save_time >= int(round(time.time())) - 30:
+
+            if last_modded_save_time >= int(round(time.time())) - 30 and not galactic_address:
                 galactic_address = get_current_location(last_modded_save)
             if config.getboolean('SETTINGS', 'OCR'):
                 last_screenshot = get_latest_screenshot()
@@ -189,25 +215,9 @@ def gather_system_info():
                     galactic_address = None
                     system_info.clear()
 
-                    if completed_system_info['address'][-2:] == '79' and not completed_bh_pairing:
-                        #This is a black hole system!
-                        #print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
-                        for key in list(completed_system_info):
-                            completed_bh_pairing['bh-' + key] = completed_system_info.pop(key)
-                    elif completed_system_info['address'][-2:] != '79' and not completed_bh_pairing:
-                        print("Starting from a system that is not a black hole is not supported by this tool at this time.")
-                    elif completed_system_info['address'][-2:] == '79' and completed_bh_pairing:
-                        # This is if both the start and exit are black holes, this shouldn't really happen unless near the center
-                        # and if they are near the center it will be the same black hole
-                        raise SystemExit("Got two consecutive black hole addresses", completed_bh_pairing,
-                                         completed_system_info, "Cannot reconcile this. DOES NOT COMPUTE")
-                    elif completed_system_info['address'][-2:] != '79' and completed_bh_pairing:
-                        # This is the second half of a bh pairing
-                        #print('Storing Exit system ' + completed_system_info['system'] + '...\n')
-                        for key in list(completed_system_info):
-                            completed_bh_pairing['exit-' + key] = completed_system_info.pop(key)
-
+                    completed_system_info, completed_bh_pairing = handle_bh_pairing_logic(completed_system_info, completed_bh_pairing)
                     completed_system_info.clear()
+
                     if 'bh-address' in completed_bh_pairing.keys() and 'exit-address' in completed_bh_pairing.keys():
                         print('Completed BH pairing and logging to CSV!')
                         time_logged = datetime.datetime.now()
