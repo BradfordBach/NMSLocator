@@ -5,12 +5,12 @@ import time
 import configparser
 import ocr
 import csv
+import winsound
 from copy import deepcopy
 from screenshot_crop import crop_screenshot
 from table_output import BHTable
 from colorclass import Windows
 from pyperclip import copy
-from winsound import PlaySound
 
 def get_current_location(last_save):
     with open(last_save, "r", encoding='utf-8') as save_file:
@@ -29,7 +29,7 @@ def get_current_location(last_save):
         copy(galactic_address)
 
         if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
-            PlaySound('notification.wav', winsound.SND_FILENAME)
+            winsound.PlaySound('notification.wav', winsound.SND_FILENAME)
 
         return(galactic_address)
     else:
