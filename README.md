@@ -5,19 +5,21 @@ This was created to aid in the logging and cataloging of black holes as part of 
 
 # Setup
 
-NMS Locator needs a few things in order to properly OCR screenshots.
+NMS Locator needs a few things in order to properly OCR screenshots.  You can follow the steps below or view the video tutorial series at https://www.youtube.com/watch?v=X7Ylm2pQjS4&list=PLwk60iLo_lz2m-QgExqkN63PkRZVOKX_d
 
 1. Download and install Tesseract available here:
 https://github.com/UB-Mannheim/tesseract/wiki
 
     I used the `4.10.2019.0314` 64 bit setup but any of them should work
-
-2. Put the `_BHS_Helper.Rehab_Submarine.UI.pak` mod file into your mods folder for NMS and enable mods.  This mod is used to put a solid background behind the system information on the galaxy screen.
-3. Open the `config.ini` file and update the following information:
+    
+2. Download the latest zip file containing all the files needed for NMS Locator, from here: https://github.com/BradfordBach/NMSLocator/releases
+    Note: Chrome will sometimes mark this zip file as unsafe/dangerous.  This is likely because Google's webcrawlers have not yet validated the download as safe as it is a new release.
+3. Put the `_BHS_Helper.Rehab_Submarine.UI.pak` mod file into your mods folder for NMS and enable mods.  This mod is used to put a solid background behind the system information on the galaxy screen.
+4. Open the `config.ini` file and update the following information:
     - Set `SCREENSHOT_DIRECTORY` to wherever your screenshots for NMS are automatically saved
     - Set `TESSERACT_LOC` to the exe file you installed in step 1.  This is typically in `C:\Program Files\Tesseract-OCR\tesseract.exe`
     - Set `CSV_DIRECTORY` to wherever you want the output of the CSV file to be stored.  By default this is stored in the `%APPDATA%\Local\Programs\NMS Locator` folder
-4. In the `resolutions.txt` file this details the area the program crops out of your screenshots, the first two numbers are your screen resolution.  Make sure that whatever resolution you play NMS at is listed in the list.  If it is not, you will need to add a line to the file in the following format:
+5. In the `resolutions.txt` file this details the area the program crops out of your screenshots, the first two numbers are your screen resolution.  Make sure that whatever resolution you play NMS at is listed in the list.  If it is not, you will need to add a line to the file in the following format:
     - `screen-width`,`screen-height`, `top x pos`, `top y pos`, `bottom x pos`, `bottom y pos`
     - The `top x pos` and the `top y pos` is the top left corner of black box surrounding the system info in the galaxy screen.
     - The `bottom x pos` and the `bottom y pos` is the bottom right corner of the black box
@@ -49,6 +51,6 @@ You should be able to stop the system anytime after you log a complete black hol
 - This locator will likely incorrectly label items if you are running closer to the core, since it expects the exit point of the black hole to be a non black hole system
 - Likewise the locator expects each black hole entry **and exit** to be a unique universe address.  If it is already logged, it will simply ignore the address.
 - The locator only stores OCR details after a full black hole exit and entry system are logged.  If you quit after running the OCR on the black hole system, that OCR data will be lost.
-- OCR tools are notoriously incorrect, and while I have made some effort to make sure the readings are more accurate, in some cases it may make mistakes.  The universal address is calculated and not a part of the OCR, so it will always be correc.
+- OCR tools are notoriously incorrect, and while I have made some effort to make sure the readings are more accurate, in some cases it may make mistakes.  The universal address is calculated and not a part of the OCR, so it will always be correct.
 - The locator is a work in progress, and there may be issues
 
