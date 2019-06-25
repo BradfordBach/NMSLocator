@@ -16,6 +16,7 @@ https://github.com/UB-Mannheim/tesseract/wiki
     Note: Chrome will sometimes mark this zip file as unsafe/dangerous.  This is likely because Google's webcrawlers have not yet validated the download as safe as it is a new release.
 3. Put the `_BHS_Helper.Rehab_Submarine.UI.pak` mod file into your mods folder for NMS and enable mods.  This mod is used to put a solid background behind the system information on the galaxy screen.
 4. Open the `config.ini` file and update the following information:
+    - Set `PLAY_NOTIFICATION` to `False` if you do not want sound notifications to play as data is entered and saved.  You can also replace or remove specific sounds to your liking in the sounds folder.
     - Set `SCREENSHOT_DIRECTORY` to wherever your screenshots for NMS are automatically saved
     - Set `TESSERACT_LOC` to the exe file you installed in step 1.  This is typically in `C:\Program Files\Tesseract-OCR\tesseract.exe`
     - Set `CSV_DIRECTORY` to wherever you want the output of the CSV file to be stored.  By default this is stored in the `%APPDATA%\Local\Programs\NMS Locator` folder
@@ -53,4 +54,16 @@ You should be able to stop the system anytime after you log a complete black hol
 - The locator only stores OCR details after a full black hole exit and entry system are logged.  If you quit after running the OCR on the black hole system, that OCR data will be lost.
 - OCR tools are notoriously incorrect, and while I have made some effort to make sure the readings are more accurate, in some cases it may make mistakes.  The universal address is calculated and not a part of the OCR, so it will always be correct.
 - The locator is a work in progress, and there may be issues
+
+## FAQ:
+*The program immediately closes after starting*
+The most likely cause of this is your screenshot directory has not been set in the config.ini.  To find out more info on your error, try running the executable in command line.
+
+*The program crashes due to a permission error*
+This can happen if you have put the program in your Program Files directory or similar place that requires advanced permissions to write too.  You can either move the location of the NMS Locator folder, or run the app as an administrator.
+
+*Will this work on a PS4 or XBox One?*
+No, this can only work on a PC for two large reasons; it needs access to the No Man's Sky save file, and it requires a mod to display a black background behind the system information.  Neither of these things are possible on consoles.
+
+
 

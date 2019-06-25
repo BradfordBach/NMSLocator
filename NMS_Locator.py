@@ -28,9 +28,6 @@ def get_current_location(last_save):
         table_handler.output_address(galactic_address)
         copy(galactic_address)
 
-        if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION'):
-            winsound.PlaySound('notification.wav', winsound.SND_FILENAME)
-
         return(galactic_address)
     else:
         return None
@@ -169,6 +166,8 @@ def handle_bh_pairing_logic(completed_system_info, completed_bh_pairing):
     if completed_system_info['address'][-2:] == '79' and not completed_bh_pairing:
         # This is a black hole system!
         # print('Storing Black Hole system ' + completed_system_info['system'] + '...\n')
+        if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION') and os.path.isfile('sounds\\system_notification.wav'):
+            winsound.PlaySound('sounds\\system_notification.wav', winsound.SND_FILENAME)
         for key in list(completed_system_info):
             completed_bh_pairing['bh-' + key] = completed_system_info.pop(key)
     elif completed_system_info['address'][-2:] != '79' and not completed_bh_pairing:
@@ -199,6 +198,10 @@ def gather_system_info():
 
             if last_modded_save_time >= int(round(time.time())) - 30 and not galactic_address:
                 galactic_address = get_current_location(last_modded_save)
+                if galactic_address and not system_info:
+                    if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION') and os.path.isfile('sounds\\data_notification.wav'):
+                        winsound.PlaySound('sounds\\data_notification.wav', winsound.SND_FILENAME)
+
             if config.getboolean('SETTINGS', 'OCR'):
                 last_screenshot = get_latest_screenshot()
                 if last_screenshot:
@@ -208,6 +211,9 @@ def gather_system_info():
                         system_info = deepcopy(ocr_info)
                         table_handler.output_ocr_info(ocr_info)
                         ocr_info.clear()
+                        if not galactic_address:
+                            if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION') and os.path.isfile('sounds\\data_notification.wav'):
+                                winsound.PlaySound('sounds\\data_notification.wav', winsound.SND_FILENAME)
 
                 if galactic_address and system_info:
                     completed_system_info = deepcopy(system_info)
@@ -224,6 +230,8 @@ def gather_system_info():
                         print(time_logged.strftime("Time logged: %B %d %I:%M:%S %p"))
                         print(completed_bh_pairing['bh-system'] + ' System -> ' + completed_bh_pairing['exit-system'] + ' System ')
                         update_csv(completed_bh_pairing)
+                        if config.getboolean('SETTINGS', 'PLAY_NOTIFICATION') and os.path.isfile('sounds\\bh_logged_notification.wav'):
+                            winsound.PlaySound('sounds\\bh_logged_notification.wav', winsound.SND_FILENAME)
                         table_handler.next_blackhole()
                         completed_bh_pairing.clear()
 
