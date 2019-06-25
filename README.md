@@ -16,10 +16,10 @@ https://github.com/UB-Mannheim/tesseract/wiki
     Note: Chrome will sometimes mark this zip file as unsafe/dangerous.  This is likely because Google's webcrawlers have not yet validated the download as safe as it is a new release.
 3. Put the `_BHS_Helper.Rehab_Submarine.UI.pak` mod file into your mods folder for NMS and enable mods.  This mod is used to put a solid background behind the system information on the galaxy screen.
 4. Open the `config.ini` file and update the following information:
-    - Set `PLAY_NOTIFICATION` to `False` if you do not want sound notifications to play as data is entered and saved.  You can also replace or remove specific sounds to your liking in the sounds folder.
     - Set `SCREENSHOT_DIRECTORY` to wherever your screenshots for NMS are automatically saved
     - Set `TESSERACT_LOC` to the exe file you installed in step 1.  This is typically in `C:\Program Files\Tesseract-OCR\tesseract.exe`
     - Set `CSV_DIRECTORY` to wherever you want the output of the CSV file to be stored.  By default this is stored in the `%APPDATA%\Local\Programs\NMS Locator` folder
+    - Set `PLAY_NOTIFICATION` to `False` if you do not want sound notifications to play as data is entered and saved.  You can also replace or remove specific sounds to your liking in the sounds folder.
 5. In the `resolutions.txt` file this details the area the program crops out of your screenshots, the first two numbers are your screen resolution.  Make sure that whatever resolution you play NMS at is listed in the list.  If it is not, you will need to add a line to the file in the following format:
     - `screen-width`,`screen-height`, `top x pos`, `top y pos`, `bottom x pos`, `bottom y pos`
     - The `top x pos` and the `top y pos` is the top left corner of black box surrounding the system info in the galaxy screen.
