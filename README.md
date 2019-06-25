@@ -56,15 +56,15 @@ You should be able to stop the system anytime after you log a complete black hol
 - The locator is a work in progress, and there may be issues
 
 ## FAQ:
-*The program immediately closes after starting*
+***The program immediately closes after starting***
 
 The most likely cause of this is your screenshot directory has not been set in the config.ini.  To find out more info on your error, try running the executable in command line.
 
-*The program crashes due to a permission error*
+***The program crashes due to a permission error***
 
-This can happen if you have put the program in your Program Files directory or similar place that requires advanced permissions to write too.  You can either move the location of the NMS Locator folder, or run the app as an administrator.
+This can happen if you have put the program in your Program Files directory or similar place that requires advanced permissions to write to.  You can either move the location of the NMS Locator folder, or run the app as an administrator.
 
-*Will this work on a PS4 or XBox One?*
+***Will this work on a PS4 or XBox One?***
 
 No, this can only work on a PC for two large reasons; it needs access to the No Man's Sky save file, and it requires a mod to display a black background behind the system information.  Neither of these things are possible on consoles.
 
