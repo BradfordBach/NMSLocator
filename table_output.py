@@ -14,14 +14,21 @@ class BHTable:
         self.current = {'bh-address': None, 'bh-system': None, 'bh-region': None, 'bh-econ': None, 'bh-life': None,
                         'exit-address': None, 'exit-system': None, 'exit-region': None, 'exit-econ': None, 'exit-life': None}
 
-    def output_address(self, address):
-        if address[-2:] == '79' and not self.current['bh-address']:
-            self.current['bh-address'] = address
-            self.latest_data = 'bh-address'
-        elif address[-2:] != '79' and not self.current['exit-address']:
-            self.current['exit-address'] = address
-            self.latest_data = 'exit-address'
-
+    def output_address(self, address, is_streamer=False):
+        if not is_streamer:
+            if address[-2:] == '79' and not self.current['bh-address']:
+                self.current['bh-address'] = address
+                self.latest_data = 'bh-address'
+            elif address[-2:] != '79' and not self.current['exit-address']:
+                self.current['exit-address'] = address
+                self.latest_data = 'exit-address'
+        else:
+            if address[-2:] == '79' and not self.current['bh-address']:
+                self.current['bh-address'] = self.censor_address(address)
+                self.latest_data = 'bh-address'
+            elif address[-2:] != '79' and not self.current['exit-address']:
+                self.current['exit-address'] = self.censor_address(address)
+                self.latest_data = 'exit-address'
         self.display_tables()
 
     def output_ocr_info(self, ocr_data):
@@ -50,6 +57,12 @@ class BHTable:
         self.previous = deepcopy(self.current)
         self.current = {'bh-address': None, 'bh-system': None, 'bh-region': None, 'bh-econ': None, 'bh-life': None,
                         'exit-address': None, 'exit-system': None, 'exit-region': None, 'exit-econ': None, 'exit-life': None}
+
+    def censor_address(self, address):
+        address_split = address.split(':')
+        address_split[2] = 'XXXX'
+        seperator = ':'
+        return seperator.join(address_split)
 
     def convert_dict_to_table(self, bh_data, draw_color=False):
 

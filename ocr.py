@@ -66,10 +66,10 @@ def ocr_screenshot(file, tesseract):
 
 
 def fix_common_ocr_issues(text):
-    common_problems = {'-l': '-I', '-k': '-K', '|': 'I', ' l ': ' I ', ' l': ' I', ' Il': ' II', ' Ill': ' III',
+    common_problems = {'-l': '-I', '-k': '-K', '|': 'I', ' l ': ' I ', ' Ill': ' III',
                        ' lV': ' IV', ' XVIll': ' XVIII', ' XIl': ' XII', ' XIll': ' XIII', ' VIl': ' VII',
-                       ' VIll': ' VIII'}
-    
+                       ' VIll': ' VIII', ' Il': ' II', ' l': ' I'}
+
     if text[:1] == 'l':
         text = list(text)
         text[0] = 'I'

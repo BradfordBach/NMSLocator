@@ -25,7 +25,7 @@ def get_current_location(last_save):
     if not check_if_address_exists(galactic_address):
         time_logged = datetime.datetime.now()
         enter_address_into_log(galactic_address, time_logged)
-        table_handler.output_address(galactic_address)
+        table_handler.output_address(galactic_address, config.getboolean('SETTINGS', 'STREAMER_MODE'))
         copy(galactic_address)
 
         return(galactic_address)
