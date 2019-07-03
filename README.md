@@ -1,5 +1,6 @@
 # NMS Locator
 
+![](https://i.imgur.com/rRLhaot.png)
 NMS locator is a python application for use with the No Man's Sky video game that will log the galactic coordinates of the player to the screen and add it to the clipboard.  With a combination of mods, and ocr, this program is also able to read in data needed for mapping black holes and save them into a csv file for easy upload.
 This was created to aid in the logging and cataloging of black holes as part of the Black Hole Suns project.  More info about the Black Hole Suns can be found at www.blackholesuns.com or the subreddit [/r/NMSBlackHoleSuns](www.reddit.com/r/NMSBlackHoleSuns/).
 
