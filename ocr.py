@@ -66,23 +66,17 @@ def ocr_screenshot(file, tesseract):
 
 
 def fix_common_ocr_issues(text):
-    if '-l' in text:
-        text = text.replace('-l', '-I')
-    if '-k' in text:
-        text = text.replace('-k', '-K')
-    if '|' in text:
-        text = text.replace('|', 'I')
+    common_problems = {'-l': '-I', '-k': '-K', '|': 'I', ' l ': ' I ', ' l': ' I', ' Il': ' II', ' Ill': ' III',
+                       ' lV': ' IV', ' XVIll': ' XVIII', ' XIl': ' XII', ' XIll': ' XIII', ' VIl': ' VII',
+                       ' VIll': ' VIII'}
+    
     if text[:1] == 'l':
         text = list(text)
         text[0] = 'I'
         text = ''.join(text)
-    if ' l ' in text:
-        text = text.replace(' l ', ' I ')
-    if ' Ill' in text:
-        text = text.replace(' Ill', ' III')
-    if ' lV' in text:
-        text = text.replace(' lV', ' IV')
-    if ' XVIll' in text:
-        text = text.replace(' XVIll', ' XVIII')
+
+    for error, fix in common_problems.items():
+        if error in text:
+            text = text.replace(error, fix)
 
     return text
